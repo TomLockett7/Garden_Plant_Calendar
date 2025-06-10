@@ -1,0 +1,87 @@
+﻿Common Name,Cutting Type,Difficulty,Cut Start,Cut End,Plant Out Start,Plant Out End,Flower Start,Flower End,Root Temp Min (°C),Root Temp Max (°C),Root Days Min,Root Days Max,Height (cm),Spread (cm),Spacing (cm),Light,Water Need,Evergreen/ Deciduous,Pollinator Friendly,How to Overwinter
+Abelia,Semi-ripe,Moderate,Jun,Aug,Sep,Oct,Jul,Oct,18,22,40,60,200,200,200,Full Sun,Moist,Semi-Evergreen,Yes,
+Abutilon,Softwood,Moderate,Apr,Jul,May,Aug,Jun,Sep,20,24,21,35,200,150,150,Full Sun,Moist,Evergreen,Yes,Green House
+Acer (Japanese Maple),Softwood,Very Difficult,May,Jun,Sep,Oct,N/A,N/A,15,18,90,120,400,400,400,Partial Shade,Moist,Deciduous,No,
+Angelonia,Softwood,Moderate,Apr,Aug,May,Jun,Jun,Sep,21,24,14,21,40,35,35,Full Sun,Moderate,Deciduous,Yes,
+Argyranthemum,Softwood,Easy,Apr,Aug,May,Jun,Jun,Oct,18,21,14,21,60,50,50,Full Sun,Moderate,Evergreen,Yes,
+Aucuba,Semi-ripe,Easy,Jul,Sep,Apr,May,Apr,May,15,20,60,90,250,250,250,Shade,Moderate,Evergreen,No,
+Azalea / Rhododendron,Semi-ripe,Very Difficult,Jul,Sep,Apr,May,May,Jun,18,22,90,180,150,150,150,Partial Shade,Moist,Evergreen,Yes,
+Bacopa,Softwood,Easy,Apr,Aug,May,Jun,Jun,Oct,18,22,14,21,15,60,60,Partial Shade,Moist,Deciduous,Yes,
+Berberis,Semi-ripe,Moderate,Jul,Sep,Apr,May,Apr,May,15,20,50,70,150,150,150,Partial Shade,Moderate,Deciduous,Yes,
+Betula (Birch),Softwood,Very Difficult,May,Jun,Sep,Oct,N/A,N/A,18,22,60,90,1500,700,700,Full Sun,Moist,Deciduous,Yes,
+Bidens,Softwood,Easy,Apr,Aug,May,Jun,Jun,Oct,20,24,10,14,30,50,50,Full Sun,Moderate,Deciduous,Yes,
+Bougainvillea,Semi-ripe,Difficult,Jun,Aug,Apr,May,Jul,Sep,24,28,40,60,500,300,200,Full Sun,Moderate,Deciduous,No,Green House
+Buddleia,Semi-ripe,Easy,Jun,Sep,Sep,Oct,Jul,Sep,18,21,21,30,300,300,300,Full Sun,Moderate,Deciduous,Yes,
+Calibrachoa (Million Bells),Softwood,Easy,Apr,Aug,May,Jun,Jun,Oct,21,24,14,21,20,40,40,Full Sun,Moderate,Deciduous,Yes,
+Camellia,Semi-ripe,Difficult,Jul,Sep,Apr,May,Feb,May,15,20,90,150,300,250,250,Partial Shade,Moist,Evergreen,Yes,
+Caryopteris,Softwood,Easy,May,Jul,Aug,Sep,Aug,Sep,20,22,21,30,90,90,90,Full Sun,Dry-Mod,Deciduous,Yes,
+Ceanothus,Semi-ripe,Moderate,Jul,Sep,Apr,May,May,Jul,18,22,60,90,200,250,250,Full Sun,Dry,Evergreen,Yes,Green House
+Chaenomeles (Quince),Semi-ripe,Moderate,Jul,Sep,Apr,May,Mar,May,18,21,50,70,150,200,200,Partial Shade,Moderate,Deciduous,Yes,
+Choisya,Semi-ripe,Moderate,Jun,Sep,Sep,Oct,May,Jun,20,24,40,60,250,250,250,Partial Shade,Moderate,Evergreen,Yes,
+Chrysanthemum,Softwood,Easy,Mar,May,Jun,Jul,Aug,Oct,16,18,14,21,90,60,60,Full Sun,Moist,Deciduous,Yes,Green House
+Clematis,Softwood,Moderate,May,Jul,Sep,Oct,Varies,Varies,18,21,40,60,300,100,60,Full Sun,Moist,Deciduous,Yes,
+Conifer (General),Semi-ripe,Moderate,Aug,Oct,Apr,May,N/A,N/A,15,18,90,180,800,300,300,Full Sun,Moderate,Evergreen,No,
+Coprosma,Semi-ripe,Moderate,Jun,Aug,Apr,May,N/A,N/A,20,24,30,50,150,100,100,Full Sun,Moderate,Evergreen,No,Green House
+Cordyline,Hardwood,Moderate,Mar,May,Jun,Jul,Jul,Aug,18,22,60,90,400,150,150,Full Sun,Dry-Mod,Evergreen,No,Green House
+Cornus (Dogwood),Hardwood,Easy,Oct,Jan,Mar,Apr,May,Jun,5,10,90,120,250,250,250,Partial Shade,Moist,Deciduous,Yes,
+Corylus (Hazel),Hardwood,Difficult,Oct,Dec,Mar,Apr,Feb,Mar,5,10,180,270,400,400,400,Partial Shade,Moist,Deciduous,Yes,
+Cotinus (Smoke Bush),Softwood,Difficult,May,Jul,Sep,Oct,Jun,Jul,20,24,50,70,400,400,400,Full Sun,Moderate,Deciduous,No,
+Cytisus (Broom),Semi-ripe,Difficult,Jul,Aug,Apr,May,May,Jun,18,22,70,100,150,150,150,Full Sun,Dry,Deciduous,Yes,
+Dahlia,Softwood,Easy,Mar,May,May,Jun,Jul,Oct,18,22,14,21,120,60,60,Full Sun,Moist,Deciduous,Yes,Green House
+Daphne,Semi-ripe,Difficult,Jul,Aug,Apr,May,Jan,Mar,18,20,90,120,120,120,120,Partial Shade,Moist,Evergreen,Yes,
+Deutzia,Softwood,Easy,May,Jun,Aug,Sep,May,Jun,18,22,21,30,150,150,150,Partial Shade,Moist,Deciduous,Yes,
+Diascia,Softwood,Easy,Apr,Aug,May,Jun,Jun,Oct,18,20,14,21,30,40,40,Full Sun,Moist,Semi-Evergreen,Yes,
+Erysimum (Perennial),Semi-ripe,Easy,Jun,Sep,Aug,Oct,Apr,Oct,18,21,21,30,75,60,60,Full Sun,Moderate,Evergreen,Yes,
+Euonymus,Semi-ripe,Easy,Jul,Oct,Apr,May,May,Jun,15,20,40,60,100,150,150,Partial Shade,Moderate,Evergreen,No,
+Euphorbia,Softwood,Moderate,Apr,Jun,Jun,Jul,Apr,Jul,20,24,21,30,80,60,60,Full Sun,Dry,Evergreen,No,
+Forsythia,Softwood,Easy,May,Jan,Sep,Mar,Mar,Apr,15,20,30,40,250,250,250,Full Sun,Moderate,Deciduous,Yes,
+Fuchsia (Hardy),Softwood,Easy,May,Jul,Aug,Sep,Jul,Oct,18,21,14,21,100,100,100,Partial Shade,Moist,Deciduous,Yes,
+Fuchsia (Tender),Softwood,Easy,Apr,Sep,May,Jun,Jun,Oct,18,21,14,21,50,50,50,Partial Shade,Moist,Deciduous,Yes,Green House
+Gardenia,Semi-ripe,Difficult,Jun,Aug,Apr,May,Jun,Aug,24,28,40,60,100,100,100,Partial Shade,Moist,Evergreen,Yes,Green House
+Hamamelis (Witch Hazel),Softwood,Very Difficult,Jun,Jul,N/A,N/A,Jan,Feb,20,22,180,365,350,350,350,Full Sun,Moist,Deciduous,Yes,
+Heather (Calluna/Erica),Semi-ripe,Moderate,Jul,Sep,Apr,May,Varies,Varies,15,18,60,90,30,45,45,Full Sun,Moist,Evergreen,Yes,
+Hebe,Semi-ripe,Easy,Jun,Sep,Apr,May,Jul,Sep,18,21,30,50,100,100,100,Full Sun,Moderate,Evergreen,Yes,
+Helianthemum (Rock Rose),Softwood,Easy,May,Jul,Aug,Sep,May,Jul,18,20,21,30,20,30,30,Full Sun,Dry,Evergreen,Yes,
+Hibiscus syriacus,Softwood,Moderate,May,Jul,Aug,Sep,Aug,Sep,22,26,40,60,250,200,200,Full Sun,Moist,Deciduous,Yes,
+Holly (Ilex),Semi-ripe,Difficult,Aug,Oct,Apr,May,May,Jun,15,20,90,180,800,400,400,Partial Shade,Moist,Evergreen,No,
+Hydrangea,Semi-ripe,Moderate,Jun,Aug,Sep,Oct,Jul,Sep,18,21,30,40,150,150,150,Partial Shade,Moist,Deciduous,No,
+Hypericum (St. John's Wort),Semi-ripe,Easy,Jul,Sep,Apr,May,Jun,Sep,18,21,30,50,90,90,90,Full Sun,Moderate,Semi-Evergreen,Yes,
+Kalmia (Mountain Laurel),Semi-ripe,Difficult,Jul,Sep,Apr,May,May,Jun,18,22,90,150,200,200,200,Partial Shade,Moist,Evergreen,Yes,
+Lamium,Softwood,Easy,Apr,Aug,May,Sep,May,Jul,15,20,14,21,20,60,60,Shade,Moist,Evergreen,Yes,
+Lantana,Softwood,Moderate,Jun,Aug,May,Jun,Jul,Oct,21,24,21,30,120,90,90,Full Sun,Dry-Mod,Evergreen,Yes,
+Lavatera (Shrubby),Softwood,Easy,May,Jul,Aug,Sep,Jun,Sep,18,22,21,30,180,150,150,Full Sun,Moderate,Semi-Evergreen,Yes,
+Lavender,Semi-ripe,Moderate,Jul,Sep,Apr,May,Jul,Aug,18,21,30,50,60,75,75,Full Sun,Dry,Evergreen,Yes,
+Lofos (Lophospermum),Softwood,Easy,Jun,Aug,May,Jun,Jul,Oct,18,22,14,21,200,50,60,Full Sun,Moderate,Deciduous,No,
+Lonicera (Honeysuckle),Semi-ripe,Easy,Jun,Aug,Sep,Oct,Jun,Aug,18,21,21,40,400,150,180,Partial Shade,Moist,Deciduous,Yes,
+Magnolia,Semi-ripe,Very Difficult,Jul,Aug,Apr,May,Apr,Jun,20,25,90,150,600,500,500,Full Sun,Moist,Deciduous,Yes,
+Mahonia,Semi-ripe,Moderate,Aug,Oct,Apr,May,Nov,Mar,18,22,90,120,200,150,150,Shade,Dry,Evergreen,Yes,
+Oregano (Origanum),Softwood,Easy,May,Aug,Jun,Jul,Jul,Sep,18,21,14,21,45,30,30,Full Sun,Dry,Deciduous,Yes,
+Osteospermum,Softwood,Easy,Apr,Aug,May,Jun,Jun,Oct,18,21,21,28,40,50,50,Full Sun,Moderate,Deciduous,Yes,Green House
+Passion Flower (P. caerulea),Semi-ripe,Moderate,Jun,Aug,Apr,May,Jul,Sep,18,22,40,60,400,150,50,Full Sun,Moist,Evergreen,Yes,Green House
+Pelargonium (Tender Geranium),Softwood,Easy,Apr,Sep,May,Jun,Jun,Oct,18,21,14,21,45,40,40,Full Sun,Dry-Mod,Evergreen,No,Green House
+Penstemon,Softwood,Easy,May,Jul,Aug,Sep,Jul,Oct,18,21,14,21,75,50,50,Full Sun,Dry,Semi-Evergreen,Yes,Green House
+Perovskia (Russian Sage),Softwood,Moderate,May,Jun,Aug,Sep,Aug,Sep,18,22,30,40,120,90,90,Full Sun,Dry,Deciduous,Yes,
+Philadelphus,Softwood,Easy,May,Jul,Aug,Sep,Jun,Jul,18,22,21,30,250,200,200,Partial Shade,Moist,Deciduous,Yes,
+Photinia,Semi-ripe,Moderate,Jul,Sep,Apr,May,Apr,May,20,25,60,80,400,400,400,Full Sun,Moist,Evergreen,No,
+Physocarpus,Softwood,Easy,May,Jul,Aug,Sep,Jun,Jul,20,24,21,30,250,250,250,Partial Shade,Moist,Deciduous,Yes,
+Pieris,Semi-ripe,Difficult,Jul,Sep,Apr,May,Apr,May,18,22,90,120,200,200,200,Partial Shade,Moist,Evergreen,Yes,
+Pittosporum,Semi-ripe,Moderate,Jul,Sep,Apr,May,May,Jun,18,22,50,70,300,250,250,Full Sun,Moist,Evergreen,No,Green House
+Plectranthus,Softwood,Easy,May,Aug,Jun,Jul,N/A,N/A,18,22,10,14,40,50,50,Shade,Moist,Evergreen,No,Green House
+Potentilla (Shrubby),Softwood,Easy,May,Jul,Aug,Sep,May,Sep,18,22,21,30,90,100,100,Full Sun,Moderate,Deciduous,Yes,
+Prunus (Flowering Cherry/Laurel),Semi-ripe,Difficult,Jun,Sep,Apr,May,Apr,May,18,22,60,90,600,500,500,Full Sun,Moist,Varies,Yes,
+Pyracantha,Semi-ripe,Moderate,Jul,Sep,Apr,May,Jun,Jul,18,22,50,70,300,300,300,Partial Shade,Moderate,Evergreen,Yes,
+Roses (Shrub/Bush),Hardwood,Moderate,Oct,Jan,Mar,Apr,Jun,Sep,4,10,120,180,120,90,90,Full Sun,Moist,Deciduous,Yes,
+Salix (Willow),Hardwood,Easy,Oct,Feb,Mar,Apr,Apr,May,4,10,40,60,500,400,400,Full Sun,Wet,Deciduous,Yes,
+Salvia (shrubby),Softwood,Easy,May,Jul,Jul,Aug,Jun,Oct,20,24,14,21,90,75,75,Full Sun,Dry-Mod,Semi-Evergreen,Yes,Green House
+Sambucus (Elder),Hardwood,Easy,Oct,Jan,Mar,Apr,Jun,Jul,5,10,60,90,300,300,300,Partial Shade,Moist,Deciduous,Yes,
+Sarcococca (Sweet Box),Semi-ripe,Moderate,Aug,Oct,Apr,May,Jan,Mar,15,20,90,120,100,100,100,Shade,Moist,Evergreen,Yes,
+Scaevola,Softwood,Moderate,Jun,Aug,May,Jun,Jun,Oct,20,24,14,21,25,50,50,Full Sun,Moderate,Deciduous,Yes,
+Skimmia,Semi-ripe,Moderate,Aug,Oct,Apr,May,Apr,May,15,18,90,150,100,100,100,Shade,Moist,Evergreen,Yes,
+Spiraea,Softwood,Easy,May,Jul,Aug,Sep,Jun,Jul,18,22,21,30,150,150,150,Full Sun,Moist,Deciduous,Yes,
+Syringa (Lilac),Softwood,Difficult,May,Jun,Aug,Sep,May,Jun,20,24,50,70,350,300,300,Full Sun,Moist,Deciduous,Yes,
+Teucrium (Germander),Softwood,Easy,May,Jul,Aug,Sep,Jul,Aug,18,22,21,30,60,60,60,Full Sun,Dry,Evergreen,Yes,
+Thymus (Thyme),Softwood,Easy,May,Jul,Aug,Sep,Jun,Jul,18,22,21,30,20,30,30,Full Sun,Dry,Evergreen,Yes,
+Viburnum,Semi-ripe,Moderate,Jun,Aug,Sep,Mar,May,Jun,18,22,50,70,250,250,250,Partial Shade,Moist,Deciduous,Yes,
+Vinca (Periwinkle),Softwood,Easy,May,Jul,Aug,Sep,Apr,Sep,15,18,21,30,20,150,100,Shade,Moderate,Evergreen,No,
+Weigela,Softwood,Easy,May,Jul,Aug,Sep,May,Jun,18,22,21,30,200,200,200,Full Sun,Moist,Deciduous,Yes,
+Wisteria,Softwood,Difficult,May,Jul,Sep,Oct,May,Jun,20,24,60,90,1000,500,300,Full Sun,Moist,Deciduous,Yes,
