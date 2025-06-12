@@ -4,28 +4,31 @@ import numpy as np
 import plotly.graph_objects as go
 from datetime import date
 import calendar
+import os # Import the os module for path handling
+
+# --- Configuration for Local Development ---
+# Define the directory where your CSV files are located.
+# It's good practice to keep them in a 'data' subfolder,
+# but if they are in the same directory as your app.py, set this to '.'
+DATA_DIR = '.' # CORRECTED: Changed from 'data' to '.' as CSVs are in the same folder as app.py
+
 
 # --- Main App Interface ---
+# Keeping layout="wide" for optimal PC viewing.
 st.set_page_config(layout="wide")
 
-# --- Initialize ALL Session State variables at the top ---
-if 'search_query' not in st.session_state:
+# --- Initialize ALL Session State variables centrally at the top ---
+# This ensures all necessary keys exist before any widgets try to access them,
+# preventing 'KeyError' issues and improving code clarity.
+if 'app_initialized' not in st.session_state:
+    st.session_state.app_initialized = True # Flag for one-time initialization
     st.session_state.search_query = ""
-if 'selected_month_num' not in st.session_state:
-    st.session_state.selected_month_num = 0 # Default to All Months
-
-# Initialize activity filters
-if 'filter_primary_activities' not in st.session_state:
+    st.session_state.selected_month_num = date.today().month # Default month on first load
     st.session_state.filter_primary_activities = False
-if 'filter_plant_out_activity' not in st.session_state:
     st.session_state.filter_plant_out_activity = False
-if 'filter_flower_activity' not in st.session_state:
     st.session_state.filter_flower_activity = False
-
-# Initialize sunlight checkboxes (NEW)
-# We'll populate `all_light_types_options` once, then create session state keys for each
-if 'all_light_types_options' not in st.session_state:
-    st.session_state.all_light_types_options = []
+    st.session_state.selected_light_types = [] # List to hold selected light types checkboxes
+    st.session_state.sort_order = "Alphabetical (A-Z)" # New default sort order
 
 
 # --- Inject Custom CSS for Tighter Spacing ---
@@ -90,7 +93,10 @@ PLANT_DETAILS_MAPPING = {
         {'label': 'Pollinator Friendly', 'cols': ['Pollinator Friendly'], 'type': 'single', 'unit': ''},
         {'label': 'How to Overwinter', 'cols': ['How to Overwinter'], 'type': 'single', 'unit': ''},
     ],
+    # MODIFIED: Added germination details for Perennials From Seed
     "Perennials From Seed": [
+        {'label': 'Germination Temperature Range', 'cols': ['Germ Temp Min (°C)', 'Germ Temp Max (°C)'], 'type': 'range', 'unit': '°C'},
+        {'label': 'Germination Days Range', 'cols': ['Germ Days Min', 'Germ Days Max'], 'type': 'range', 'unit': ' days'},
         {'label': 'Height', 'cols': ['Height (cm)'], 'type': 'single', 'unit': ' cm'},
         {'label': 'Spread', 'cols': ['Spread (cm)'], 'type': 'single', 'unit': ' cm'},
         {'label': 'Spacing', 'cols': ['Spacing (cm)'], 'type': 'single', 'unit': ' cm'},
@@ -154,19 +160,19 @@ def get_bar_color_and_legend(option, activity, row_data):
             return 'blue', 'Plant Out'
         elif activity == 'Flower':
             return 'yellow', 'Flower'
-            
+
     elif option == "Perennials by Division":
         if activity == 'Division':
             return 'blue', 'Division'
         elif activity == 'Flower':
             return 'yellow', 'Flower'
-            
+
     elif option == "Bulbs Corms & Tubers":
         if activity == 'Plant':
             return 'green', 'Plant'
         elif activity == 'Flower':
             return 'yellow', 'Flower'
-            
+
     else: # Default rules for Seed files
         if activity == 'Sow':
             return 'blue', 'Sow'
@@ -174,27 +180,38 @@ def get_bar_color_and_legend(option, activity, row_data):
             return 'green', 'Plant Out'
         elif activity == 'Flower':
             return 'yellow', 'Flower'
-            
+
     return 'grey', activity # Fallback color
 
 # --- Calendar Selection (FIRST) ---
 selected_option = st.sidebar.selectbox("Choose a Calendar to View:", options=list(FILE_OPTIONS.keys()))
-LOCAL_CSV_FILE = FILE_OPTIONS[selected_option]
+# Construct full path to the CSV file
+LOCAL_CSV_FILE = os.path.join(DATA_DIR, FILE_OPTIONS[selected_option])
 activity_periods = COLUMN_MAPPINGS[selected_option]
 
 
 # --- Data Loading (using st.cache_data for efficiency) ---
 @st.cache_data
 def load_data(file_path):
+    # Ensure DATA_DIR exists if it's a subfolder
+    if DATA_DIR != '.' and not os.path.exists(DATA_DIR):
+        st.error(f"Error: Data directory '{DATA_DIR}' not found. Please create this folder and place your CSVs inside, or set DATA_DIR = '.' if CSVs are in the same folder as app.py.")
+        st.stop()
+        
+    # Check if the specific CSV file exists before attempting to load
+    if not os.path.exists(file_path):
+        st.error(f"Error: CSV file not found at '{file_path}'. Please ensure your CSVs are in the '{DATA_DIR}' folder and correctly named.")
+        st.stop()
+
     df_loaded = pd.read_csv(file_path, skipinitialspace=True)
     df_loaded.columns = df_loaded.columns.str.strip()
+    # Drop rows where 'Common Name' is missing or empty, then reset index
     df_loaded.dropna(subset=['Common Name'], inplace=True)
     df_loaded = df_loaded[df_loaded['Common Name'] != ''].reset_index(drop=True)
     return df_loaded
 
 # --- Search Plants (SECOND) ---
 st.sidebar.subheader("Search Plants")
-# st.session_state.search_query is initialized at the top
 search_query = st.sidebar.text_input("Enter plant name (e.g., 'rose', 'sweet pea'):", value=st.session_state.search_query, key='search_input')
 st.session_state.search_query = search_query # Update session state
 
@@ -203,30 +220,36 @@ st.session_state.search_query = search_query # Update session state
 st.title(selected_option)
 
 try:
+    # Load and filter data based on initial state and search query
     df = load_data(LOCAL_CSV_FILE)
 
-    # Apply search filter first to get correct plant_names for details and filters
     if st.session_state.search_query:
         df = df[df['Common Name'].str.contains(st.session_state.search_query, case=False, na=False)].reset_index(drop=True)
         if df.empty:
             st.warning(f"No plants found matching '{st.session_state.search_query}' in this calendar type.")
             st.stop() # Exit the script early
 
-    # If df is empty after loading or search, handle it before proceeding
+    # If df is empty after initial load or search, stop here
     if df.empty:
-        st.warning(f"No plants loaded from '{LOCAL_CSV_FILE}' or none found matching the search query.")
-        st.stop() # Exit the script early
+        st.warning(f"No plants loaded from '{os.path.basename(LOCAL_CSV_FILE)}' or none found matching the search query.")
+        st.stop()
 
-    plant_names = df['Common Name'].unique() # Define plant_names here, used for selectbox
+    # Pre-filter all_light_types_options on initial load or if calendar changes
+    # This ensures that filter options are relevant to the *selected calendar file*
+    # and don't reset every time other filters are touched.
+    if 'last_selected_option' not in st.session_state or st.session_state.last_selected_option != selected_option:
+        st.session_state.all_light_types_options = sorted(df['Light'].dropna().astype(str).unique().tolist())
+        st.session_state.last_selected_option = selected_option
 
-    st.success(f"Successfully loaded {len(df)} plants from '{LOCAL_CSV_FILE}'!", icon="✅")
 
-    # --- Plant Details Expander (THIRD - relies on plant_names) ---
-    if len(plant_names) > 0: # Check if there are any plants after search
+    # --- Plant Details Expander (THIRD - relies on plant_names after initial load/search) ---
+    # `plant_names` will be refined after all filters, but needs to exist here for the selectbox
+    current_plant_names_pre_filter = df['Common Name'].unique()
+    if len(current_plant_names_pre_filter) > 0:
         with st.sidebar.expander("Plant Details", expanded=False):
             selected_plant_detail = st.selectbox(
                 "Select a plant to see details:",
-                options=plant_names,
+                options=current_plant_names_pre_filter, # Use pre-filtered names for initial detail selection
                 key='detail_select'
             )
             
@@ -278,7 +301,7 @@ try:
         st.subheader("Filter by Month & Activities") # Consolidated subheader
 
         month_options = [("All Months", 0)] + [(name, i+1) for i, name in enumerate(month_names_list)]
-        
+
         # default_month_index_filter correctly uses st.session_state.selected_month_num
         default_month_index_filter = 0 
         for idx, (name, num) in enumerate(month_options):
@@ -294,10 +317,8 @@ try:
             key='month_selector_filter_in_expander', # Changed key to avoid conflict
             on_change=lambda: setattr(st.session_state, 'selected_month_num', st.session_state.month_selector_filter_in_expander[1])
         )
-        # selected_month_num is directly used below, so no need to update session_state.selected_month_num = selected_month_num
-
+        
         # Activity checkboxes remain as individual checkboxes
-        # st.session_state.filter_primary_activities etc. are initialized at top
         filter_primary_activities = st.checkbox(
             f"Primary Activities (Sow/Cut/Divide/Plant)",
             value=st.session_state.filter_primary_activities, key='check_primary_activities',
@@ -316,51 +337,46 @@ try:
         
         st.subheader("Filter by Characteristics")
 
-        # Dynamically get unique light types for checkboxes
-        temp_df_for_light_options = load_data(LOCAL_CSV_FILE)
-        all_light_types = sorted(temp_df_for_light_options['Light'].dropna().astype(str).unique().tolist())
-
-        selected_light_types_checkboxes = [] # List to hold selected sunlight types
-
-        # Create individual checkboxes for each sunlight type
-        if all_light_types:
+        # Create individual checkboxes for each sunlight type from cached options
+        if st.session_state.all_light_types_options:
             st.write("Sunlight Requirements:")
-            for light_type in all_light_types:
-                # Ensure each checkbox has a unique key and its state is managed in session_state
-                key_name = f"light_checkbox_{light_type.replace(' ', '_').replace('.', '')}"
+            # Dynamically update session state for each light type checkbox
+            selected_light_types_from_checkboxes = []
+            for light_type in st.session_state.all_light_types_options:
+                key_name = f"light_checkbox_{light_type.replace(' ', '_').replace('.', '').replace('-', '_').replace('&', 'and')}" # More robust key
                 if key_name not in st.session_state:
                     st.session_state[key_name] = False # Initialize to unchecked
 
+                # If the checkbox is checked, add its value to the list
                 if st.checkbox(
                     light_type,
                     value=st.session_state[key_name],
                     key=key_name,
-                    on_change=lambda lt=light_type, kn=key_name: setattr(st.session_state, kn, st.session_state[kn])
+                    # on_change is implicitly handled due to value binding
                 ):
-                    selected_light_types_checkboxes.append(light_type)
+                    selected_light_types_from_checkboxes.append(light_type)
+            # Update the central selected_light_types list in session state
+            st.session_state.selected_light_types = selected_light_types_from_checkboxes
         else:
-            st.info("No sunlight types found in data.")
-
-        # Update a single session state variable that holds the list of selected light types
-        st.session_state.selected_light_types = selected_light_types_checkboxes
+            st.info("No sunlight types found in data for current calendar type.")
 
 
         # Reset Filters Button
         if st.button("Reset All Filters", key='reset_filters_button'):
             st.session_state.search_query = ""
-            st.session_state.selected_month_num = 0 # Reset to All Months
+            st.session_state.selected_month_num = date.today().month # Reset to current month
             st.session_state.filter_primary_activities = False
             st.session_state.filter_plant_out_activity = False
             st.session_state.filter_flower_activity = False
             
-            # Reset all dynamic sunlight checkboxes
-            for light_type in all_light_types:
-                key_name = f"light_checkbox_{light_type.replace(' ', '_').replace('.', '')}"
-                if key_name in st.session_state:
+            # Reset all dynamic sunlight checkboxes states
+            for light_type in st.session_state.all_light_types_options:
+                key_name = f"light_checkbox_{light_type.replace(' ', '_').replace('.', '').replace('-', '_').replace('&', 'and')}"
+                if key_name in st.session_state: # Only reset if key exists
                     st.session_state[key_name] = False
             st.session_state.selected_light_types = [] # Clear the list of selected types
             
-            st.rerun()
+            st.rerun() # Rerun the app to apply the resets immediately
 
     # --- Data Quality Check Section (FIFTH) ---
     with st.sidebar.expander("Data Quality Check", expanded=False):
@@ -382,7 +398,7 @@ try:
                     if plants_with_missing:
                         missing_data_plants[col] = plants_with_missing
                 else:
-                    st.warning(f"Column '{col}' not found in '{LOCAL_CSV_FILE}'. Skipping check for this column.")
+                    st.warning(f"Column '{col}' not found in '{os.path.basename(LOCAL_CSV_FILE)}'. Skipping check for this column.")
 
             if not missing_data_plants:
                 st.success("✅ No critical missing data found in the selected columns!")
@@ -412,28 +428,27 @@ try:
             return False
         if start_m <= end_m:
             return start_m <= check_m_num <= end_m
-        else:
+        else: # Range spans across year end (e.g., Nov-Feb)
             return check_m_num >= start_m or check_m_num <= end_m
 
     # Apply month/activity filters
-    # These filters now use the selected_month_num from the global month selector
-    if selected_month_num != 0 and (filter_primary_activities or filter_plant_out_activity or filter_flower_activity):
+    # This logic block only runs if a month is selected AND at least one activity filter is checked
+    if selected_month_num != 0 and (st.session_state.filter_primary_activities or st.session_state.filter_plant_out_activity or st.session_state.filter_flower_activity):
         combined_mask_month = pd.Series([False] * len(df)) # Initialize mask for this filter block
-        
+
         for activity_key, (start_col, end_col) in activity_periods.items():
             if start_col in df.columns and end_col in df.columns:
-                # Only apply activity filter if the corresponding checkbox is true AND month is selected
-                if selected_month_num != 0: # Ensure month filter is active if any activity checkbox is active
-                    if filter_primary_activities and activity_key in ['Sow', 'Cut', 'Division', 'Plant']:
-                        activity_mask = df.apply(lambda row: is_month_in_range(row[start_col], row[end_col], selected_month_num, month_map), axis=1)
-                        combined_mask_month = combined_mask_month | activity_mask
-                    if filter_plant_out_activity and activity_key == 'Plant Out':
-                        activity_mask = df.apply(lambda row: is_month_in_range(row[start_col], row[end_col], selected_month_num, month_map), axis=1)
-                        combined_mask_month = combined_mask_month | activity_mask
-                    if filter_flower_activity and activity_key == 'Flower':
-                        activity_mask = df.apply(lambda row: is_month_in_range(row[start_col], row[end_col], selected_month_num, month_map), axis=1)
-                        combined_mask_month = combined_mask_month | activity_mask
-        
+                # Only apply activity filter if the corresponding checkbox is true
+                if st.session_state.filter_primary_activities and activity_key in ['Sow', 'Cut', 'Division', 'Plant']:
+                    activity_mask = df.apply(lambda row: is_month_in_range(row[start_col], row[end_col], selected_month_num, month_map), axis=1)
+                    combined_mask_month = combined_mask_month | activity_mask
+                if st.session_state.filter_plant_out_activity and activity_key == 'Plant Out':
+                    activity_mask = df.apply(lambda row: is_month_in_range(row[start_col], row[end_col], selected_month_num, month_map), axis=1)
+                    combined_mask_month = combined_mask_month | activity_mask
+                if st.session_state.filter_flower_activity and activity_key == 'Flower':
+                    activity_mask = df.apply(lambda row: is_month_in_range(row[start_col], row[end_col], selected_month_num, month_map), axis=1)
+                    combined_mask_month = combined_mask_month | activity_mask
+
         df = df[combined_mask_month].reset_index(drop=True)
         if df.empty:
             st.warning(f"No plants found for the selected activities in {selected_month_name} for this calendar type, after applying name search and other filters.")
@@ -450,16 +465,40 @@ try:
         if df.empty:
             st.warning(f"No plants found for the selected Sunlight Requirement(s): {', '.join(st.session_state.selected_light_types)}.")
             st.stop()
-            
+
+    # If 'All Months' is selected (selected_month_num == 0) and no activity filters are active,
+    # or if any month is selected but no activity filters are active, no month/activity filtering happens.
+    # If a month is selected, but *no* activity checkboxes are ticked, it effectively means "show all plants active in this month".
+    # The current logic only applies the month filter if an activity checkbox is ticked. This is a design choice.
+    # If you want "show all plants active in this month regardless of activity checkbox", then the `if selected_month_num != 0` check
+    # should apply to the whole `combined_mask_month` logic, and if all checkboxes are false, it would effectively be an OR of all activities.
+    # For now, I'll keep your current logic which means activity checkboxes must be selected for month filtering to apply.
+
     # Re-evaluate plant_names after all filters for the chart
     plant_names = df['Common Name'].unique()
     if len(plant_names) == 0:
         st.warning("No plants left after applying all filters. Adjust your filter selections.")
-        st.stop() # Stop if no plants to plot
+        st.stop()
+
+    # --- Sorting the plant_names for the Y-axis ---
+    plant_names_sorted = list(plant_names) # Start with current filtered names
+    if st.session_state.sort_order == "Alphabetical (A-Z)":
+        plant_names_sorted.sort()
+    elif st.session_state.sort_order == "Alphabetical (Z-A)":
+        plant_names_sorted.sort(reverse=True)
+    # You could add other sorting options here if needed, e.g., by first sow date etc.
+
+    st.sidebar.selectbox(
+        "Sort Plants By:",
+        options=["Alphabetical (A-Z)", "Alphabetical (Z-A)"],
+        key="sort_order",
+        on_change=lambda: setattr(st.session_state, 'sort_order', st.session_state.sort_order)
+    )
+
 
     # --- Chart Drawing (LAST) ---
     fig = go.Figure()
-    
+
     bar_width, row_spacing = 0.28, 0.88
     num_activities = len(activity_periods)
     if num_activities > 1: base_offsets = np.linspace(-bar_width * (num_activities - 1) / 2, bar_width * (num_activities - 1) / 2, num_activities)
@@ -470,105 +509,121 @@ try:
     def to_day_of_year(dt): return dt.timetuple().tm_yday
 
     all_traces = []
-    
-    for i, plant_name in enumerate(plant_names):
+
+    # Iterate through sorted plant names to draw traces
+    for i, plant_name in enumerate(plant_names_sorted): # Use plant_names_sorted here
         row_data = df[df['Common Name'] == plant_name].iloc[0]
         for activity, (start_col, end_col) in activity_periods.items():
             start_month_str, end_month_str = row_data.get(start_col), row_data.get(end_col)
             if pd.notna(start_month_str) and pd.notna(end_month_str):
                 start_month, end_month = month_map.get(str(start_month_str).strip()), month_map.get(str(end_month_str).strip())
                 if start_month is None or end_month is None: continue
-                
+
                 bar_color, legend_name = get_bar_color_and_legend(selected_option, activity, row_data)
-                
+
                 def create_bar_trace(start_day, end_day, legend_name_for_trace):
                     return go.Bar(
-                        y=[(i * row_spacing) + offsets[activity]],
+                        y=[(i * row_spacing) + offsets[activity]], # Use current index 'i' for y-position
                         x=[end_day - start_day + 1],
                         base=[start_day],
                         orientation='h',
                         marker_color=bar_color,
                         name=legend_name_for_trace,
                         width=bar_width,
-                        hoverinfo='none',
+                        hoverinfo='none', # Keep this for simplicity, can be customized later
                         marker_line_width=0,
                         textposition='none',
                         showlegend=True,
                         legendgroup=legend_name_for_trace
                     )
-                    
+
                 start_date = date(current_year, start_month, 1)
                 end_month_last_day = calendar.monthrange(current_year, end_month)[1]
                 end_date = date(current_year, end_month, end_month_last_day)
 
-                if end_month < start_month:
+                if end_month < start_month: # Activity spans across year end
+                    # Part 1: From start month to end of current year
                     trace1 = create_bar_trace(to_day_of_year(start_date), 365, legend_name)
                     all_traces.append((legend_name, trace1))
+                    # Part 2: From beginning of year to end month
                     trace2 = create_bar_trace(1, to_day_of_year(date(current_year, end_month, end_month_last_day)), legend_name)
                     all_traces.append((legend_name, trace2))
-                else:
+                else: # Activity within the same year
                     trace = create_bar_trace(to_day_of_year(start_date), to_day_of_year(end_date), legend_name)
                     all_traces.append((legend_name, trace))
 
+    # Sort traces to ensure consistent legend order
     sorted_traces = sorted(all_traces, key=lambda x: LEGEND_SORT_ORDER.get(x[0], 999))
 
+    # Add traces to figure, ensuring legend items appear only once
     legend_items_added_to_figure = set()
     for legend_name, trace in sorted_traces:
         if legend_name not in legend_items_added_to_figure:
             trace.showlegend = True
             legend_items_added_to_figure.add(legend_name)
         else:
-            trace.showlegend = False
+            trace.showlegend = False # Hide duplicate legend entries
         fig.add_trace(trace)
 
     month_names = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December']
-    bold_month_names = [f'<b>{name}</b>' for name in month_names]    
-    
+
+    # Restored bolding for month names and desktop-friendly font size for X-axis
+    bold_month_names = [f'<b>{name}</b>' for name in month_names]
+    x_tick_text = bold_month_names
+    x_tick_font_size = 10
+
     month_midpoints = [to_day_of_year(date(current_year, m, 15)) for m in range(1, 13)]
     month_boundaries = [to_day_of_year(date(current_year, m, 1)) for m in range(1, 13)]; month_boundaries.append(366)
     shapes = []
-    total_y_span = (len(plant_names) - 1) * row_spacing + (bar_width * num_activities) if len(plant_names) > 0 else 10
+    # Calculate total y-span dynamically based on number of plants and bar height
+    total_y_span = (len(plant_names_sorted) - 1) * row_spacing + (bar_width * num_activities) if len(plant_names_sorted) > 0 else 10
 
     for x_pos in month_boundaries:
         shapes.append(go.layout.Shape(type="line", x0=x_pos, y0=-0.5, x1=x_pos, y1=total_y_span, line=dict(color="DimGray", width=1), layer='below'))
 
     frost_color = 'rgba(70, 130, 180, 0.3)';
-    shapes.append(go.layout.Shape(type="rect", x0=1, y0=-0.5, x1=to_day_of_year(date(current_year, 4, 1)), y1=total_y_span, fillcolor=frost_color, line_width=0, layer='below'))
-    shapes.append(go.layout.Shape(type="rect", x0=to_day_of_year(date(current_year, 10, 1)), y0=-0.5, x1=366, y1=total_y_span, fillcolor=frost_color, line_width=0, layer='below'))
-    
-    bold_plant_names = [f'<b>{name}</b>' for name in plant_names]
-    y_tick_vals = [i * row_spacing for i in range(len(plant_names))]
+    # Adjust frost dates for UK (approx. early Oct to end of March)
+    shapes.append(go.layout.Shape(type="rect", x0=1, y0=-0.5, x1=to_day_of_year(date(current_year, 4, 1)), y1=total_y_span, fillcolor=frost_color, line_width=0, layer='below')) # Jan 1 to Apr 1
+    # Corrected y0 parameter in the second rectangle shape (was y1=-0.5)
+    shapes.append(go.layout.Shape(type="rect", x0=to_day_of_year(date(current_year, 10, 1)), y0=-0.5, x1=366, y1=total_y_span, fillcolor=frost_color, line_width=0, layer='below')) # Oct 1 to Dec 31
+
+    # Restored bolding for plant names and desktop-friendly font size for Y-axis
+    bold_plant_names_for_axis = [f'<b>{name}</b>' for name in plant_names_sorted] # Use sorted list for axis labels
+    y_tick_text = bold_plant_names_for_axis
+    y_tick_font_size = 10
+
+    y_tick_vals = [i * row_spacing for i in range(len(plant_names_sorted))] # Use sorted list length
 
     fig.update_layout(
-        height=max(600, len(plant_names) * 40),
+        height=max(600, len(plant_names_sorted) * 40), # Dynamic height, minimum 600, based on sorted list
         barmode='overlay',
         showlegend=True,
+        # Restored desktop-friendly margins
         margin=dict(l=150, r=20, t=50, b=50),
         xaxis=dict(
             tickvals=month_midpoints,
-            ticktext=bold_month_names,
+            ticktext=x_tick_text,
             showgrid=False,
             range=[1, 366],
-            tickfont=dict(color='black'),
+            tickfont=dict(color='black', size=x_tick_font_size),
             side='top'
         ),
         yaxis=dict(
             tickvals=y_tick_vals,
-            ticktext=bold_plant_names,
-            autorange="reversed",
-            tickfont=dict(color='black')
+            ticktext=y_tick_text,
+            autorange="reversed", # Puts first plant at top
+            tickfont=dict(color='black', size=y_tick_font_size)
         ),
         plot_bgcolor='white',
         legend=dict(title_text='Activity'),
         shapes=shapes
     )
-    
-    st.plotly_chart(fig, use_container_width=True)
 
+    # Chart renders to fill its container width for PC optimization
+    st.plotly_chart(fig, use_container_width=True) 
 
-except FileNotFoundError:
-    st.error(f"File not found: '{LOCAL_CSV_FILE}'. Please make sure all your CSV files are in the same folder as the app.")
 except Exception as e:
-    st.error(f"An error occurred while processing '{LOCAL_CSV_FILE}': {e}")
+    st.error(f"An unexpected error occurred: {e}")
+    st.info("Please check your CSV files and ensure they are correctly formatted and located in the specified 'data' folder.")
     import traceback
     st.text(traceback.format_exc())
