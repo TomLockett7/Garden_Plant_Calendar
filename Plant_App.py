@@ -92,6 +92,7 @@ PLANT_DETAILS_MAPPING = {
         {'label': 'Water Need', 'cols': ['Water Need'], 'type': 'single', 'unit': ''},
         {'label': 'Pollinator Friendly', 'cols': ['Pollinator Friendly'], 'type': 'single', 'unit': ''},
         {'label': 'How to Overwinter', 'cols': ['How to Overwinter'], 'type': 'single', 'unit': ''},
+        {'label': 'Notes', 'cols': ['Notes'], 'type': 'single', 'unit': ''}, # Added Notes
     ],
     # MODIFIED: Added germination details for Perennials From Seed
     "Perennials From Seed": [
@@ -119,11 +120,12 @@ PLANT_DETAILS_MAPPING = {
     "Bulbs Corms & Tubers": [
         {'label': 'Height', 'cols': ['Height (cm)'], 'type': 'single', 'unit': ' cm'},
         {'label': 'Spread', 'cols': ['Spread (cm)'], 'type': 'single', 'unit': ' cm'},
-        {'label': 'Spacing', 'cols': ['Spacing (cm)'], 'type': 'single', 'unit': ' cm'},
+        {'label': 'Spacing', 'cols': ['Spacing (cm)'], 'type': 'single', 'unit': ''},
         {'label': 'Light', 'cols': ['Light'], 'type': 'single', 'unit': ''},
         {'label': 'Water Need', 'cols': ['Water Need'], 'type': 'single', 'unit': ''},
         {'label': 'Pollinator Friendly', 'cols': ['Pollinator Friendly'], 'type': 'single', 'unit': ''},
-        {'label': 'How to Overwinter', 'cols': ['How to Overwinter'], 'type': 'single', 'unit': ''},
+        {'label': 'How to Overwinter', 'cols': ['How to Overwinter / Post-Flowering Care'], 'type': 'single', 'unit': ''}, # Corrected column name
+        {'label': 'Notes', 'cols': ['Notes'], 'type': 'single', 'unit': ''}, # Added Notes
     ],
 }
 
@@ -193,6 +195,18 @@ activity_periods = COLUMN_MAPPINGS[selected_option]
 # --- Data Loading (using st.cache_data for efficiency) ---
 @st.cache_data
 def load_data(file_path):
+    # Determine the correct 'Common Name' column based on the selected file
+    common_name_col_map = {
+        "Annuals_by_Seed.csv": "Common Name (Scientific)",
+        "Bulbs_Corms_Tubers.csv": "Common Name",
+        "Perennials_by_Division.csv": "Common Name",
+        "Perennials_by_Seed.csv": "Common Name",
+        "Perennials_Shrubs_by_Cutting.csv": "Common Name"
+    }
+    
+    file_name = os.path.basename(file_path)
+    common_name_column = common_name_col_map.get(file_name, "Common Name") # Default to 'Common Name'
+
     # Ensure DATA_DIR exists if it's a subfolder
     if DATA_DIR != '.' and not os.path.exists(DATA_DIR):
         st.error(f"Error: Data directory '{DATA_DIR}' not found. Please create this folder and place your CSVs inside, or set DATA_DIR = '.' if CSVs are in the same folder as app.py.")
@@ -205,10 +219,16 @@ def load_data(file_path):
 
     df_loaded = pd.read_csv(file_path, skipinitialspace=True)
     df_loaded.columns = df_loaded.columns.str.strip()
-    # Drop rows where 'Common Name' is missing or empty, then reset index
-    df_loaded.dropna(subset=['Common Name'], inplace=True)
-    df_loaded = df_loaded[df_loaded['Common Name'] != ''].reset_index(drop=True)
-    return df_loaded
+    
+    # Drop rows where the determined 'Common Name' column is missing or empty, then reset index
+    if common_name_column in df_loaded.columns:
+        df_loaded.dropna(subset=[common_name_column], inplace=True)
+        df_loaded = df_loaded[df_loaded[common_name_column] != ''].reset_index(drop=True)
+    else:
+        st.error(f"Error: Expected column '{common_name_column}' not found in '{file_name}'. Please check your CSV file.")
+        st.stop()
+    
+    return df_loaded, common_name_column # Return both DataFrame and the common name column name
 
 # --- Search Plants (SECOND) ---
 st.sidebar.subheader("Search Plants")
@@ -220,11 +240,11 @@ st.session_state.search_query = search_query # Update session state
 st.title(selected_option)
 
 try:
-    # Load and filter data based on initial state and search query
-    df = load_data(LOCAL_CSV_FILE)
+    # Load data and get the correct common name column
+    df, common_name_column = load_data(LOCAL_CSV_FILE)
 
     if st.session_state.search_query:
-        df = df[df['Common Name'].str.contains(st.session_state.search_query, case=False, na=False)].reset_index(drop=True)
+        df = df[df[common_name_column].str.contains(st.session_state.search_query, case=False, na=False)].reset_index(drop=True)
         if df.empty:
             st.warning(f"No plants found matching '{st.session_state.search_query}' in this calendar type.")
             st.stop() # Exit the script early
@@ -244,7 +264,7 @@ try:
 
     # --- Plant Details Expander (THIRD - relies on plant_names after initial load/search) ---
     # `plant_names` will be refined after all filters, but needs to exist here for the selectbox
-    current_plant_names_pre_filter = df['Common Name'].unique()
+    current_plant_names_pre_filter = df[common_name_column].unique()
     if len(current_plant_names_pre_filter) > 0:
         with st.sidebar.expander("Plant Details", expanded=False):
             selected_plant_detail = st.selectbox(
@@ -254,7 +274,7 @@ try:
             )
             
             if selected_plant_detail:
-                plant_data = df[df['Common Name'] == selected_plant_detail].iloc[0]
+                plant_data = df[df[common_name_column] == selected_plant_detail].iloc[0]
 
                 def get_clean_value(row_data, col_name):
                     value = row_data.get(col_name, None)
@@ -387,13 +407,13 @@ try:
             
             critical_columns = ['Height (cm)', 'Spread (cm)', 'Light', 'Water Need', 'Pollinator Friendly']
             
-            current_df_for_quality_check = load_data(LOCAL_CSV_FILE)
+            current_df_for_quality_check, common_name_column_qc = load_data(LOCAL_CSV_FILE) # Get common_name_column here too
             
             missing_data_plants = {}
             for col in critical_columns:
                 if col in current_df_for_quality_check.columns:
-                    missing_mask = current_df_for_quality_check[col].isna() | (current_df_for_quality_check[col].astype(str).str.strip() == '')
-                    plants_with_missing = current_df_for_quality_check[missing_mask]['Common Name'].tolist()
+                    missing_mask = current_df_for_quality_check[col].isna() | (current_df_for_quality_check[col].astype(str).strip() == '')
+                    plants_with_missing = current_df_for_quality_check[missing_mask][common_name_column_qc].tolist() # Use dynamic common_name_column
                     
                     if plants_with_missing:
                         missing_data_plants[col] = plants_with_missing
@@ -475,7 +495,7 @@ try:
     # For now, I'll keep your current logic which means activity checkboxes must be selected for month filtering to apply.
 
     # Re-evaluate plant_names after all filters for the chart
-    plant_names = df['Common Name'].unique()
+    plant_names = df[common_name_column].unique() # Use dynamic common_name_column
     if len(plant_names) == 0:
         st.warning("No plants left after applying all filters. Adjust your filter selections.")
         st.stop()
@@ -512,7 +532,7 @@ try:
 
     # Iterate through sorted plant names to draw traces
     for i, plant_name in enumerate(plant_names_sorted): # Use plant_names_sorted here
-        row_data = df[df['Common Name'] == plant_name].iloc[0]
+        row_data = df[df[common_name_column] == plant_name].iloc[0] # Use dynamic common_name_column
         for activity, (start_col, end_col) in activity_periods.items():
             start_month_str, end_month_str = row_data.get(start_col), row_data.get(end_col)
             if pd.notna(start_month_str) and pd.notna(end_month_str):
