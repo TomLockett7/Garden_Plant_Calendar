@@ -124,8 +124,8 @@ PLANT_DETAILS_MAPPING = {
         {'label': 'Light', 'cols': ['Light'], 'type': 'single', 'unit': ''},
         {'label': 'Water Need', 'cols': ['Water Need'], 'type': 'single', 'unit': ''},
         {'label': 'Pollinator Friendly', 'cols': ['Pollinator Friendly'], 'type': 'single', 'unit': ''},
-        {'label': 'How to Overwinter', 'cols': ['How to Overwinter / Post-Flowering Care'], 'type': 'single', 'unit': ''}, # Corrected column name
-        {'label': 'Notes', 'cols': ['Notes'], 'type': 'single', 'unit': ''}, # Added Notes
+        {'label': 'How to Overwinter', 'cols': ['How to Overwinter'], 'type': 'single', 'unit': ''}, # CORRECTED: Changed back to 'How to Overwinter'
+        {'label': 'Notes', 'cols': ['Notes'], 'type': 'single', 'unit': ''},
     ],
 }
 
@@ -305,8 +305,9 @@ try:
                             st.markdown(f"<div class='detail-item'><p class='no-margin-p'><b>{label}</b></p><p class='no-margin-p'>{display_text}</p></div>", unsafe_allow_html=True)
                     elif item_type == 'single':
                         value = get_clean_value(plant_data, col_names[0])
-                        if value is not None:
-                            st.markdown(f"<div class='detail-item'><p class='no-margin-p'><b>{label}</b></p><p class='no-margin-p'>{value}{unit}</p></div>", unsafe_allow_html=True)
+                        # Always display the label, show "N/A" if value is None
+                        display_value = value if value is not None else "N/A"
+                        st.markdown(f"<div class='detail-item'><p class='no-margin-p'><b>{label}</b></p><p class='no-margin-p'>{display_value}{unit}</p></div>", unsafe_allow_html=True)
                 
     else:
         st.sidebar.info("No plants available to display details for.")
