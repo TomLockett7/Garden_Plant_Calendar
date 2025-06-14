@@ -62,7 +62,7 @@ FILE_OPTIONS = {
 
 COLUMN_MAPPINGS = {
     "Annuals From Seed": {'Sow': ('Sow Start', 'Sow End'), 'Plant Out': ('Plant Out Start', 'Plant Out End'), 'Flower': ('Flower Start', 'Flower End')},
-    "Perennials From Seed": {'Sow': ('Sow Start', 'Sow End'), 'Plant Out': ('Plant Out Start', 'Plant Out End'), 'Flower': ('Flower Start', 'Flower End')},
+    "Perennials From Seed": {'Sow': ('Sow Start (Indoors)', 'Sow End'), 'Plant Out': ('Plant Out Start (Outdoors)', 'Plant Out End'), 'Flower': ('Flower Start', 'Flower End')}, # CORRECTED Column Names
     "Perennials & Shrubs From Cuttings": {'Cut': ('Cut Start', 'Cut End'), 'Plant Out': ('Plant Out Start', 'Plant Out End'), 'Flower': ('Flower Start', 'Flower End')},
     "Perennials by Division": {'Division': ('Division Start', 'Division End'), 'Flower': ('Flower Start', 'Flower End')},
     "Bulbs Corms & Tubers": {'Plant': ('Plant Start', 'Plant End'), 'Flower': ('Flower Start', 'Flower End')}
@@ -197,7 +197,7 @@ activity_periods = COLUMN_MAPPINGS[selected_option]
 def load_data(file_path):
     # Determine the correct 'Common Name' column based on the selected file
     common_name_col_map = {
-        "Annuals_by_Seed.csv": "Common Name (Scientific)",
+        "Annuals_by_Seed.csv": "Common Name",  # CORRECTED: Changed from "Common Name (Scientific)"
         "Bulbs_Corms_Tubers.csv": "Common Name",
         "Perennials_by_Division.csv": "Common Name",
         "Perennials_by_Seed.csv": "Common Name",
@@ -413,7 +413,7 @@ try:
             missing_data_plants = {}
             for col in critical_columns:
                 if col in current_df_for_quality_check.columns:
-                    missing_mask = current_df_for_quality_check[col].isna() | (current_df_for_quality_check[col].astype(str).strip() == '')
+                    missing_mask = current_df_for_quality_check[col].isna() | (current_df_for_quality_check[col].astype(str).str.strip() == '') # Corrected
                     plants_with_missing = current_df_for_quality_check[missing_mask][common_name_column_qc].tolist() # Use dynamic common_name_column
                     
                     if plants_with_missing:
