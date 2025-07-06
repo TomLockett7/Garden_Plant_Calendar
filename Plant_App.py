@@ -414,7 +414,7 @@ try:
                                     orientation='h',
                                     marker=dict(color=ACTIVITY_COLORS.get(activity_key, 'grey')),
                                     name=activity_key,
-                                    hovertemplate=f"<b>{plant_name}</b><br>{activity_key}: %{{base}} - %{{x}+%{{base}}}<extra></extra>",
+                                    hovertemplate=f"<b>{plant_name}</b><br>{activity_key}: %{{base}} - %{{x}}<extra></extra>",
                                     showlegend=True # Will be handled by sorting later
                                 )
                             ))
