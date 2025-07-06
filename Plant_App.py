@@ -23,13 +23,14 @@ st.set_page_config(layout="wide")
 # preventing 'KeyError' issues and improving code clarity.
 if 'app_initialized' not in st.session_state:
     st.session_state.app_initialized = True # Flag for one-time initialization
-    st.session_state.search_query = ""
+    st.session_state.search_query = "" # Initialize search_query
     st.session_state.selected_month_num = date.today().month # Default month on first load
     st.session_state.filter_primary_activities = False
     st.session_state.filter_plant_out_activity = False
     st.session_state.filter_flower_activity = False
     st.session_state.selected_light_types = [] # List to hold selected light types checkboxes
     st.session_state.sort_order = "Alphabetical (A-Z)" # New default sort order
+    st.session_state.search_query_raw = "" # Initialize for the raw text input
 
 
 # --- Inject Custom CSS for Tighter Spacing ---
@@ -192,7 +193,17 @@ if df.empty:
 
 # Search input
 st.sidebar.header("Search & Filter")
-st.session_state.search_query = st.sidebar.text_input("Search Plants:", value=st.session_state.search_query, placeholder="e.g., 'Rose', 'Daisy'", help="Type to search by Common Name.").lower()
+# CORRECTED: Separate text_input from search_query assignment and lowercasing
+st.sidebar.text_input(
+    "Search Plants:",
+    value=st.session_state.search_query_raw, # Use the raw input variable from session state
+    placeholder="e.g., 'Rose', 'Daisy'",
+    key="search_query_raw", # This key will update st.session_state.search_query_raw
+    help="Type to search by Common Name."
+)
+# Update the main search_query variable with the lowercased version for filtering
+st.session_state.search_query = st.session_state.search_query_raw.lower()
+
 
 # Month selection
 current_month_name = get_month_name(st.session_state.selected_month_num)
@@ -226,11 +237,12 @@ if 'Light' in df.columns:
 
 # Sort Order
 st.sidebar.subheader("Sort Order:")
-st.session_state.sort_order = st.sidebar.radio(
+# CORRECTED: Removed assignment to st.session_state.sort_order here
+st.sidebar.radio(
     "Choose sort order:",
     ("Alphabetical (A-Z)", "Alphabetical (Z-A)", "Reverse Chronological"),
     index=0 if st.session_state.sort_order == "Alphabetical (A-Z)" else (1 if st.session_state.sort_order == "Alphabetical (Z-A)" else 2),
-    key="sort_order",
+    key="sort_order", # This key automatically updates st.session_state.sort_order
     help="Change the order in which plants are displayed."
 )
 
