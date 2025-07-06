@@ -138,6 +138,7 @@ def load_data(file_path):
         # Convert month names to numerical representation for sorting and filtering
         month_to_num = {name: i for i, name in enumerate(calendar.month_abbr[1:] + calendar.month_name[1:], 1)}
 
+        # Iterate through the specific column mappings for the selected file type
         for activity_type in COLUMN_MAPPINGS[st.session_state.selected_file_type]:
             start_col, end_col = COLUMN_MAPPINGS[st.session_state.selected_file_type][activity_type]
             if start_col in df.columns:
@@ -414,7 +415,7 @@ try:
                                     orientation='h',
                                     marker=dict(color=ACTIVITY_COLORS.get(activity_key, 'grey')),
                                     name=activity_key,
-                                    hovertemplate=f"<b>{plant_name}</b><br>{activity_key}: %{{base}} - %{{x}}<extra></extra>",
+                                    hovertemplate=f"<b>{plant_name}</b><br>{activity_key}: %{{base}} - %{{x}}<extra></extra>", # CORRECTED HERE
                                     showlegend=True # Will be handled by sorting later
                                 )
                             ))
@@ -428,7 +429,7 @@ try:
                                     orientation='h',
                                     marker=dict(color=ACTIVITY_COLORS.get(activity_key, 'grey')),
                                     name=activity_key,
-                                    hovertemplate=f"<b>{plant_name}</b><br>{activity_key}: %{{base}} - %{{x}+%{{base}}}<extra></extra>",
+                                    hovertemplate=f"<b>{plant_name}</b><br>{activity_key}: %{{base}} - %{{x}}<extra></extra>", # CORRECTED HERE
                                     showlegend=True # Will be handled by sorting later
                                 )
                             ))
@@ -443,7 +444,7 @@ try:
                                     orientation='h',
                                     marker=dict(color=ACTIVITY_COLORS.get(activity_key, 'grey')),
                                     name=activity_key,
-                                    hovertemplate=f"<b>{plant_name}</b><br>{activity_key}: %{{base}} - %{{x}+%{{base}}}<extra></extra>",
+                                    hovertemplate=f"<b>{plant_name}</b><br>{activity_key}: %{{base}} - %{{x}}<extra></extra>", # CORRECTED HERE
                                     showlegend=True # Will be handled by sorting later
                                 )
                             ))
@@ -472,7 +473,9 @@ try:
         month_boundaries = [to_day_of_year(date(current_year, m, 1)) for m in range(1, 13)]; month_boundaries.append(366)
         shapes = []
         # Calculate total y-span dynamically based on number of plants and bar height
-        total_y_span = (len(plant_names_sorted) - 1) * row_spacing + (bar_width * num_activities) if len(plant_names_sorted) > 0 else 10 # num_activities here is a placeholder. It should be the max number of activities for any single plant. Given fixed offsets, it can be simplified. A safer approach for total_y_span would be (len(plant_names_sorted) * row_spacing) + a small buffer.
+        # Simplified total_y_span calculation for robustness
+        total_y_span = (len(plant_names_sorted) * row_spacing) + 1 # A simple sum of row spacings + buffer
+
 
         for x_pos in month_boundaries:
             shapes.append(go.layout.Shape(type="line", x0=x_pos, y0=-0.5, x1=x_pos, y1=total_y_span, line=dict(color="DimGray", width=1), layer='below'))
