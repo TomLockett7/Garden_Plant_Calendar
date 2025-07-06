@@ -62,7 +62,7 @@ FILE_OPTIONS = {
 
 COLUMN_MAPPINGS = {
     "Annuals From Seed": {'Sow': ('Sow Start', 'Sow End'), 'Plant Out': ('Plant Out Start', 'Plant Out End'), 'Flower': ('Flower Start', 'Flower End')},
-    "Perennials From Seed": {'Sow': ('Sow Start (Indoors)', 'Sow End'), 'Plant Out': ('Plant Out Start (Outdoors)', 'Plant Out End'), 'Flower': ('Flower Start', 'Flower End')}, # CORRECTED Column Names
+    "Perennials From Seed": {'Sow': ('Sow Start', 'Sow End'), 'Plant Out': ('Plant Out Start', 'Plant Out End'), 'Flower': ('Flower Start', 'Flower End')}, # CORRECTED Column Names to match simpler CSV headers
     "Perennials & Shrubs From Cuttings": {'Cut': ('Cut Start', 'Cut End'), 'Plant Out': ('Plant Out Start', 'Plant Out End'), 'Flower': ('Flower Start', 'Flower End')},
     "Perennials by Division": {'Division': ('Division Start', 'Division End'), 'Flower': ('Flower Start', 'Flower End')},
     "Bulbs Corms & Tubers": {'Plant': ('Plant Start', 'Plant End'), 'Flower': ('Flower Start', 'Flower End')}
